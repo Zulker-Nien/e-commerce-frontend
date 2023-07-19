@@ -32,14 +32,14 @@ export const options: NextAuthOptions = {
 
         if (foundUser) {
           if (foundUser.password === credentials?.password) {
-            // toast.success("Login successful!");
-            return foundUser; // Return the user data
+            toast.success("Login successful!");
+            return foundUser;
           } else {
-            // toast.error("Invalid password.");
+            toast.error("Invalid password.");
             return null;
           }
         } else {
-          // toast.error("User not found");
+          toast.error("User not found");
           return null;
         }
       },
