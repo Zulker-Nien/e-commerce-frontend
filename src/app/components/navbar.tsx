@@ -1,17 +1,75 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
+// import { options } from "../api/auth/[...nextauth]/options";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { useRouter, usePathname } from "next/navigation";
+import Store from "@/store";
+import { observer } from "mobx-react-lite";
+import CartSlider from "./CartSlider";
 
 const Navbar = () => {
+  const store = useContext(Store);
+  const {
+    setCartIsActive,
+    cartIsActive,
+    cartItems,
+    handleRemoveCartItem,
+    setCartIsInactive,
+  } = store;
+
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [showMenu, setShowMenu] = useState(false);
   const [showToggleMenu, setShowToggleMenu] = useState(false);
+  const { data: session, status } = useSession();
+  const handleSignOut = async () => {
+    await signOut();
+  };
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/");
+    } else if (status === "authenticated") {
+      router.push("/");
+    }
+  }, [status]);
+
+  useEffect(() => {
+    // Fetch cart items on the client
+    const fetchCartItems = async () => {
+      try {
+        // Replace this URL with the actual endpoint that fetches the cart items
+        const response = await fetch("/api/cart-items");
+        const data = await response.json();
+        store.initializeCartItems(data);
+      } catch (error) {
+        console.error("Failed to fetch cart items:", error);
+      }
+    };
+
+    if (status === "authenticated") {
+      // Fetch and initialize cart items if the user is authenticated
+      fetchCartItems();
+    }
+  }, [status]);
+
   const handleShowMenu = () => {
     setShowMenu(!showMenu);
   };
   const handleShowToggleMenu = () => {
     setShowToggleMenu(!showToggleMenu);
   };
+  const subtotal = useMemo(() => {
+    return cartItems.reduce(
+      (total, item) => +(total + item.totalPrice).toFixed(2),
+      0
+    );
+  }, [cartItems]);
+
+  const isActive = pathname;
+
   return (
     <nav className="bg-gray-800">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -35,13 +93,13 @@ const Navbar = () => {
                 className="block h-6 w-6"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke-width="1.5"
+                strokeWidth="1.5"
                 stroke="currentColor"
                 aria-hidden="true"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
                 />
               </svg>
@@ -54,13 +112,13 @@ const Navbar = () => {
                 className="hidden h-6 w-6"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke-width="1.5"
+                strokeWidth="1.5"
                 stroke="currentColor"
                 aria-hidden="true"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   d="M6 18L18 6M6 6l12 12"
                 />
               </svg>
@@ -77,59 +135,61 @@ const Navbar = () => {
               />
             </div>
             <div className="hidden sm:ml-6 sm:block">
-              <div className="flex space-x-4">
-                {/* <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" --> */}
-                <Link
-                  href="#"
-                  className="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
-                  aria-current="page"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  href="#"
-                  className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                >
-                  Team
-                </Link>
-                <Link
-                  href="#"
-                  className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                >
-                  Projects
-                </Link>
-                <Link
-                  href="#"
-                  className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                >
-                  Calendar
-                </Link>
-              </div>
+              {status === "authenticated" ? (
+                <div className="flex space-x-4">
+                  {/* <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" --> */}
+                  <Link
+                    href="/"
+                    className={`${
+                      isActive === "/"
+                        ? "bg-gray-900"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    } rounded-md px-3 py-2 text-sm font-medium`}
+                    aria-current="page"
+                  >
+                    Home
+                  </Link>
+                  <Link
+                    href="/products"
+                    className={`${
+                      isActive === "/products"
+                        ? "bg-gray-900"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    } rounded-md px-4 py-2 text-sm font-medium`}
+                    aria-current="page"
+                  >
+                    All Products
+                  </Link>
+                  <Link
+                    href="/dashboard"
+                    className={`${
+                      isActive === "/dashboard"
+                        ? "bg-gray-900"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    } rounded-md px-4 py-2 text-sm font-medium`}
+                  >
+                    My Dashboard
+                  </Link>
+                </div>
+              ) : (
+                <div className="flex space-x-4">
+                  <Link
+                    href="/"
+                    className={`${
+                      isActive === "/"
+                        ? "bg-gray-900"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    } rounded-md px-3 py-2 text-sm font-medium`}
+                    aria-current="page"
+                  >
+                    Home
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-            <button
-              type="button"
-              className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-            >
-              <span className="sr-only">View notifications</span>
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-                />
-              </svg>
-            </button>
-
-            {/* <!-- Profile dropdown --> */}
+          {/* <!-- Profile dropdown --> */}
+          {status === "authenticated" ? (
             <div className="relative ml-3">
               <div>
                 <button
@@ -189,15 +249,76 @@ const Navbar = () => {
                   >
                     Settings
                   </a>
-                  <a
-                    href="#"
+                  <button
                     className="block px-4 py-2 text-sm text-gray-700"
                     role="menuitem"
                     tabIndex={-1}
                     id="user-menu-item-2"
+                    onClick={() => {
+                      handleSignOut();
+                    }}
                   >
                     Sign out
-                  </a>
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <button
+                className={`${
+                  isActive === "/auth/signin"
+                    ? "bg-gray-900"
+                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                } rounded-md px-4 py-2 text-sm font-medium`}
+                onClick={async () => {
+                  await signIn();
+                  router.push("/");
+                }}
+              >
+                Sign In
+              </button>
+              <p> | </p>
+              <button
+                className={`${
+                  isActive === "/register"
+                    ? "bg-gray-900"
+                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                } rounded-md px-4 py-2 text-sm font-medium`}
+                onClick={() => router.push("/register")}
+              >
+                Sign Up
+              </button>
+            </>
+          )}
+          <div className=" flex items-center">
+            <div className="ml-4 flow-root lg:ml-6 z-20">
+              <button
+                onClick={setCartIsActive}
+                className="group -m-2 flex items-center p-2 cursor-pointer"
+              >
+                <svg
+                  className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                  />
+                </svg>
+                <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
+                  {Array.isArray(cartItems) && cartItems && cartItems.length}
+                </span>
+                <span className="sr-only">items in cart, view bag</span>
+              </button>
+              {cartIsActive && (
+                <div>
+                  <CartSlider />
                 </div>
               )}
             </div>
@@ -240,4 +361,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default observer(Navbar);
