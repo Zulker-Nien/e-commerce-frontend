@@ -2,6 +2,9 @@
 import { observer } from "mobx-react-lite";
 import CartSlider from "./components/CartSlider";
 import Landing from "./components/landing";
+import { getServerSession } from "next-auth";
+import { options } from "./api/auth/[...nextauth]/options";
+import { useEffect } from "react";
 
 export type CategoryProps = {
   id: number;

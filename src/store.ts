@@ -26,6 +26,7 @@ class Store {
   categoryIsActive = "";
   isLoading = false;
   itemCount = 0;
+  addProductModal: boolean = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -144,6 +145,12 @@ class Store {
   };
   setItemRefresh = () => {
     this.itemCount = 0;
+  };
+  setAddProductModal = () => {
+    this.addProductModal = true;
+  };
+  setRemoveProductModal = () => {
+    this.addProductModal = false;
   };
 }
 
