@@ -1,6 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
-import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GitHubProvider from "next-auth/providers/github";
+import { GithubProfile } from "next-auth/providers/github";
 import { toast } from "react-toastify";
 const getUserData = async () => {
   const res = await fetch(
@@ -32,21 +33,37 @@ export const options: NextAuthOptions = {
 
         if (foundUser) {
           if (foundUser.password === credentials?.password) {
-            toast.success("Login successful!");
             return foundUser;
           } else {
-            toast.error("Invalid password.");
             return null;
           }
         } else {
-          toast.error("User not found");
           return null;
         }
       },
     }),
     GitHubProvider({
+      profile(profile: GithubProfile) {
+        // console.log(profile)
+        return {
+          ...profile,
+          role: profile.role ?? "user",
+          id: profile.id.toString(),
+          img: profile.avatar_url,
+        };
+      },
       clientId: process.env.GITHUB_ID as string,
       clientSecret: process.env.GITHUB_Secret as string,
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) token.role = user.role;
+      return token;
+    },
+    async session({ session, token }) {
+      if (session?.user) session.user.role = token.role;
+      return session;
+    },
+  },
 };
