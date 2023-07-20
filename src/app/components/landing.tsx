@@ -31,21 +31,15 @@ const Landing = () => {
             </h2>
             <h2>Start by clicking the sign in button.</h2>
             <p className="mt-6 text-lg leading-8 text-gray-300">
-              Ac euismod vel sit maecenas id pellentesque eu sed consectetur.
-              Malesuada adipiscing sagittis vel nulla.
+              This is the landing page but didn&apos;t put extra work on it
+              other than the one above.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
               <Link
-                href=""
-                className="lg:rounded-0 rounded-0 bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                href="/api/auth/signin"
+                className="lg:rounded-0 rounded-0 bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 Get Started
-              </Link>
-              <Link
-                href="#"
-                className="text-sm font-semibold leading-6 text-white"
-              >
-                Learn more <span aria-hidden="true">→</span>
               </Link>
             </div>
           </div>

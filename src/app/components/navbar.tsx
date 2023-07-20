@@ -8,8 +8,13 @@ import { useRouter, usePathname } from "next/navigation";
 import Store from "@/store";
 import { observer } from "mobx-react-lite";
 import CartSlider from "./CartSlider";
+import { getServerSession } from "next-auth";
+import type { DefaultSession, User } from "next-auth";
 
-const Navbar = () => {
+type Props = {
+  user: ({ id: string; role: string } & DefaultSession) | undefined;
+};
+const Navbar = ({ user }: Props) => {
   const store = useContext(Store);
   const {
     setCartIsActive,
@@ -36,25 +41,6 @@ const Navbar = () => {
     }
   }, [status]);
 
-  useEffect(() => {
-    // Fetch cart items on the client
-    const fetchCartItems = async () => {
-      try {
-        // Replace this URL with the actual endpoint that fetches the cart items
-        const response = await fetch("/api/cart-items");
-        const data = await response.json();
-        store.initializeCartItems(data);
-      } catch (error) {
-        console.error("Failed to fetch cart items:", error);
-      }
-    };
-
-    if (status === "authenticated") {
-      // Fetch and initialize cart items if the user is authenticated
-      fetchCartItems();
-    }
-  }, [status]);
-
   const handleShowMenu = () => {
     setShowMenu(!showMenu);
   };
@@ -75,7 +61,6 @@ const Navbar = () => {
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-            {/* <!-- Mobile menu button--> */}
             <button
               type="button"
               className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
@@ -84,11 +69,7 @@ const Navbar = () => {
               onClick={() => handleShowToggleMenu()}
             >
               <span className="sr-only">Open main menu</span>
-              {/* <!--
-            Icon when menu is closed.
 
-            Menu open: "hidden", Menu closed: "block"
-          --> */}
               <svg
                 className="block h-6 w-6"
                 fill="none"
@@ -103,11 +84,7 @@ const Navbar = () => {
                   d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
                 />
               </svg>
-              {/* <!--
-            Icon when menu is open.
 
-            Menu open: "block", Menu closed: "hidden"
-          --> */}
               <svg
                 className="hidden h-6 w-6"
                 fill="none"
@@ -135,60 +112,98 @@ const Navbar = () => {
               />
             </div>
             <div className="hidden sm:ml-6 sm:block">
-              {status === "authenticated" ? (
-                <div className="flex space-x-4">
-                  {/* <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" --> */}
-                  <Link
-                    href="/"
-                    className={`${
-                      isActive === "/"
-                        ? "bg-gray-900"
-                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                    } rounded-md px-3 py-2 text-sm font-medium`}
-                    aria-current="page"
-                  >
-                    Home
-                  </Link>
-                  <Link
-                    href="/products"
-                    className={`${
-                      isActive === "/products"
-                        ? "bg-gray-900"
-                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                    } rounded-md px-4 py-2 text-sm font-medium`}
-                    aria-current="page"
-                  >
-                    All Products
-                  </Link>
-                  <Link
-                    href="/dashboard"
-                    className={`${
-                      isActive === "/dashboard"
-                        ? "bg-gray-900"
-                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                    } rounded-md px-4 py-2 text-sm font-medium`}
-                  >
-                    My Dashboard
-                  </Link>
-                </div>
-              ) : (
-                <div className="flex space-x-4">
-                  <Link
-                    href="/"
-                    className={`${
-                      isActive === "/"
-                        ? "bg-gray-900"
-                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                    } rounded-md px-3 py-2 text-sm font-medium`}
-                    aria-current="page"
-                  >
-                    Home
-                  </Link>
-                </div>
-              )}
+              <div className="flex space-x-4">
+                {user?.role !== "admin" && user?.role !== "manager" && (
+                  <>
+                    <Link
+                      href="/"
+                      className={`${
+                        isActive === "/"
+                          ? "bg-gray-900"
+                          : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                      } rounded-md px-3 py-2 text-sm font-medium`}
+                      aria-current="page"
+                    >
+                      Home
+                    </Link>
+                    <Link
+                      href="/products"
+                      className={`${
+                        isActive === "/products"
+                          ? "bg-gray-900"
+                          : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                      } rounded-md px-4 py-2 text-sm font-medium`}
+                      aria-current="page"
+                    >
+                      Shop
+                    </Link>
+                  </>
+                )}
+                {status === "authenticated" && (
+                  <>
+                    {user?.role === "customer" && (
+                      <Link
+                        href="/myorders"
+                        className={`${
+                          isActive === "/myorders"
+                            ? "bg-gray-900"
+                            : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                        } rounded-md px-4 py-2 text-sm font-medium`}
+                      >
+                        My Orders
+                      </Link>
+                    )}
+                    {user?.role === "admin" && (
+                      <Link
+                        href="/dashboard"
+                        className={`${
+                          isActive === "/dashboard"
+                            ? "bg-gray-900"
+                            : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                        } rounded-md px-4 py-2 text-sm font-medium`}
+                      >
+                        Home
+                      </Link>
+                    )}
+                    {(user?.role === "admin" || user?.role === "manager") && (
+                      <>
+                        <Link
+                          href="/allorders"
+                          className={`${
+                            isActive === "/allorders"
+                              ? "bg-gray-900"
+                              : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                          } rounded-md px-4 py-2 text-sm font-medium`}
+                        >
+                          All Orders
+                        </Link>
+                        <Link
+                          href="/customers"
+                          className={`${
+                            isActive === "/customers"
+                              ? "bg-gray-900"
+                              : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                          } rounded-md px-4 py-2 text-sm font-medium`}
+                        >
+                          Customers
+                        </Link>
+                        <Link
+                          href="/productlist"
+                          className={`${
+                            isActive === "/productlist"
+                              ? "bg-gray-900"
+                              : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                          } rounded-md px-4 py-2 text-sm font-medium`}
+                        >
+                          Product List
+                        </Link>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
-          {/* <!-- Profile dropdown --> */}
           {status === "authenticated" ? (
             <div className="relative ml-3">
               <div>
@@ -214,26 +229,20 @@ const Navbar = () => {
                 </button>
               </div>
 
-              {/* Dropdown menu, show/hide based on menu state.
-
-            Entering: "transition ease-out duration-100"
-              From: "transform opacity-0 scale-95"
-              To: "transform opacity-100 scale-100"
-            Leaving: "transition ease-in duration-75"
-              From: "transform opacity-100 scale-100"
-              To: "transform opacity-0 scale-95" */}
               {showMenu && (
                 <div
-                  className=" absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                  className=" absolute flex flex-col justify-center right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                   role="menu"
                   aria-orientation="vertical"
                   aria-labelledby="user-menu-button"
                   tabIndex={-1}
                 >
-                  {/* <!-- Active: "bg-gray-100", Not Active: "" --> */}
+                  <h3 className="block px-4 py-2 flex justify-center text-sm text-lime-500">
+                    {user?.role.toUpperCase()}
+                  </h3>
                   <a
                     href="#"
-                    className="block px-4 py-2 text-sm text-gray-700"
+                    className="block  py-2 flex justify-center hover:bg-gray-100 text-sm text-gray-700"
                     role="menuitem"
                     tabIndex={-1}
                     id="user-menu-item-0"
@@ -242,7 +251,7 @@ const Navbar = () => {
                   </a>
                   <a
                     href="#"
-                    className="block px-4 py-2 text-sm text-gray-700"
+                    className="block  py-2  flex justify-center hover:bg-gray-100 text-sm text-gray-700"
                     role="menuitem"
                     tabIndex={-1}
                     id="user-menu-item-1"
@@ -250,13 +259,11 @@ const Navbar = () => {
                     Settings
                   </a>
                   <button
-                    className="block px-4 py-2 text-sm text-gray-700"
+                    className="block  py-2 flex justify-center hover:bg-gray-100 text-sm text-gray-700"
                     role="menuitem"
                     tabIndex={-1}
                     id="user-menu-item-2"
-                    onClick={() => {
-                      handleSignOut();
-                    }}
+                    onClick={handleSignOut}
                   >
                     Sign out
                   </button>
@@ -273,7 +280,7 @@ const Navbar = () => {
                 } rounded-md px-4 py-2 text-sm font-medium`}
                 onClick={async () => {
                   await signIn();
-                  router.push("/");
+                  // router.push("/");
                 }}
               >
                 Sign In
@@ -291,38 +298,40 @@ const Navbar = () => {
               </button>
             </>
           )}
-          <div className=" flex items-center">
-            <div className="ml-4 flow-root lg:ml-6 z-20">
-              <button
-                onClick={setCartIsActive}
-                className="group -m-2 flex items-center p-2 cursor-pointer"
-              >
-                <svg
-                  className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
+          {user?.role !== "admin" && user?.role !== "manager" && (
+            <div className=" flex items-center">
+              <div className="ml-4 flow-root lg:ml-6 z-20">
+                <button
+                  onClick={setCartIsActive}
+                  className="group -m-2 flex items-center p-2 cursor-pointer"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                  />
-                </svg>
-                <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-                  {Array.isArray(cartItems) && cartItems && cartItems.length}
-                </span>
-                <span className="sr-only">items in cart, view bag</span>
-              </button>
-              {cartIsActive && (
-                <div>
-                  <CartSlider />
-                </div>
-              )}
+                  <svg
+                    className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                    />
+                  </svg>
+                  <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
+                    {Array.isArray(cartItems) && cartItems && cartItems.length}
+                  </span>
+                  <span className="sr-only">items in cart, view bag</span>
+                </button>
+                {cartIsActive && (
+                  <div>
+                    <CartSlider />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
