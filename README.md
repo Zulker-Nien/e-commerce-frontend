@@ -1,34 +1,34 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+The [Demo](https://e-commerce-frontend-lime.vercel.app/) is deployed on Vercel, but if you want to run the development server locally:
 
-First, run the development server:
+#### npm run dev
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+Head over to the [Credentials Link ](https://zulker-nien.github.io/demo-json-data/db.json) to use the information for signin.
+#### Navbar elements are loaded dynamically based on the role of the user.
+I have used [NextAuth](https://next-auth.js.org/) to help with the signIn and signOut of users with different roles.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+For signup, I used demo api from [Fakestoreapi](https://fakestoreapi.com/docs). Check the inspect element when you submit the registration form.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+For loading the products, I have used [Fakestore's get all product api](https://fakestoreapi.com/docs#:~:text=Products-,Get%20all%20products,-fetch(%27https)).
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+The selected products are added to cart through state management.
+#### MobX store was used for state management. 
+It is lightweight and is less complex than redux. An additional observer dependency was required from mobx-react-lite.
 
-## Learn More
+For the admin dashboard, which is the "Home" on the Navbar, I have used Tremor to add the analytical charts.
 
-To learn more about Next.js, take a look at the following resources:
+#### Features that aren't added.
+1) Toastify - To display notifications. 
+2) Framer-motion - To animate the abrupt loading(Only Cart slider utilizes this dependency).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### This assessment was done in 3 WORKDAYS, without creating the user flows, ui design and ofcourse the whole architecture design.
+- User flows would have helped with ease in route.
+- I am a certified Ui Designer and based on my past experiences, this is a mediocre design. A full thoughtout design would have helped in better user experience.
+- With better architecture design, a robust product can be made.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### Some of the elements have been left open ended due to time constraint.
+1) My Orders - Customer View
+2) Edit Products - Admin/Manager View
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Finally, another addition to the list of projects for which I am thankful to [Repliq](https://www.repliq.dev/)
