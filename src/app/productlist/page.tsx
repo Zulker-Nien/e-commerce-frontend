@@ -44,9 +44,9 @@ const ProductList = () => {
   }, [list, filter]);
   return (
     <div className="flex mt-4">
-      <div className=" w-screen py-2  sm:px-6 lg:px-8">
-        <div className="flex justify-around item-center text-white">
-          <div className="flex items-center ">
+      <div className=" w-screen overflow-x-hidden py-2  sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-y-4 text-white">
+          <div className="flex justify-between items-center lg:justify-around col-span-1">
             <h3 className="px-8">Filter by Category:</h3>
             <select
               value={filter.category}
@@ -62,7 +62,7 @@ const ProductList = () => {
               <option value="jewelery">Jewelery</option>
             </select>
           </div>
-          <div className="flex items-center ">
+          <div className="flex justify-between items-center lg:justify-around col-span-1">
             <h3 className="px-8">Filter by Price:</h3>
             <input
               type="number"
@@ -72,60 +72,65 @@ const ProductList = () => {
               placeholder="Enter max price"
             />
           </div>
+          <span col-span-1></span>
           <button
-            className="p-4 bg-gray-800 rounded-md hover:bg-gray-700"
+            className="p-4 bg-gray-800 rounded-md hover:bg-gray-700 "
             onClick={setAddProductModal}
           >
             Add New Product
           </button>
         </div>
-        <table className="w-full text-left text-sm font-light mt-4">
-          <thead className="w-full border-b bg-white font-medium dark:border-neutral-500 dark:bg-gray-800">
-            <tr>
-              <th scope="col" className="px-6 py-4">
-                #
-              </th>
-              <th scope="col" className="px-6 py-4">
-                Title
-              </th>
-              <th scope="col" className="px-6 py-4">
-                Price
-              </th>
-              <th scope="col" className="px-6 py-4">
-                Category
-              </th>
-              <th scope="col" className="px-6 py-4">
-                Edit
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredList.map((item, index) => {
-              return (
-                <tr
-                  key={index}
-                  className="border-b bg-neutral-100 dark:border-neutral-500 dark:bg-gray-600"
-                >
-                  <td className="whitespace-nowrap px-6 py-4 font-medium">
-                    {item.id}
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4">{item.title}</td>
-                  <td className="whitespace-nowrap px-6 py-4">
-                    $ {item.price}
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4">
-                    {item.category}
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4">
-                    <button className="bg-gray-800 p-4 rounded-md hover:bg-gray-700">
-                      Edit Product
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="w-screen overflow-x-scroll">
+          <table className="w-full overflow-x-scroll text-left text-sm font-light mt-4">
+            <thead className="w-full overflow-x-scroll border-b bg-white font-medium dark:border-neutral-500 dark:bg-gray-800">
+              <tr>
+                <th scope="col" className="px-6 py-4">
+                  #
+                </th>
+                <th scope="col" className="px-6 py-4">
+                  Title
+                </th>
+                <th scope="col" className="px-6 py-4">
+                  Price
+                </th>
+                <th scope="col" className="px-6 py-4">
+                  Category
+                </th>
+                <th scope="col" className="px-6 py-4">
+                  Edit
+                </th>
+              </tr>
+            </thead>
+            <tbody className="overflow-x-scroll">
+              {filteredList.map((item, index) => {
+                return (
+                  <tr
+                    key={index}
+                    className="border-b bg-neutral-100 dark:border-neutral-500 dark:bg-gray-600"
+                  >
+                    <td className="whitespace-nowrap px-6 py-4 font-medium">
+                      {item.id}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      {item.title}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      $ {item.price}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      {item.category}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <button className="bg-gray-800 p-4 rounded-md hover:bg-gray-700">
+                        Edit Product
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
       {addProductModal && <AddProduct />}
     </div>

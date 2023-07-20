@@ -18,7 +18,7 @@ const Customers = () => {
   }, []);
   return (
     <div className="flex mt-4">
-      <div className=" w-screen py-2  sm:px-6 lg:px-8">
+      <div className=" w-screen overflow-x-scroll py-2  sm:px-6 lg:px-8">
         <table className="w-full text-left text-sm font-light mt-4 text-center">
           <thead className="w-full border-b bg-white font-medium dark:border-neutral-500 dark:bg-gray-800">
             <tr>

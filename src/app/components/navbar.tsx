@@ -338,31 +338,93 @@ const Navbar = ({ user }: Props) => {
       {showToggleMenu && (
         <div className="sm:hidden" id="mobile-menu">
           <div className="space-y-1 px-2 pb-3 pt-2">
-            <Link
-              href="#"
-              className="bg-gray-900 text-white block rounded-md px-3 py-2 text-base font-medium"
-              aria-current="page"
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="#"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium"
-            >
-              Team
-            </Link>
-            <Link
-              href="#"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium"
-            >
-              Projects
-            </Link>
-            <Link
-              href="#"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium"
-            >
-              Calendar
-            </Link>
+            {user?.role !== "admin" && user?.role !== "manager" && (
+              // <div className="flex space-x-4">
+              <Link
+                href="/"
+                className={`${
+                  isActive === "/"
+                    ? "bg-gray-900"
+                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                } rounded-md px-3 py-2 text-base font-medium block`}
+                aria-current="page"
+              >
+                Home
+              </Link>
+            )}
+            {user?.role !== "admin" && user?.role !== "manager" && (
+              <Link
+                href="/products"
+                className={`${
+                  isActive === "/products"
+                    ? "bg-gray-900"
+                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                } rounded-md px-4 py-2 text-base font-medium block`}
+                aria-current="page"
+              >
+                Shop
+              </Link>
+            )}
+
+            {status === "authenticated" && user?.role === "customer" && (
+              <Link
+                href="/myorders"
+                className={`${
+                  isActive === "/myorders"
+                    ? "bg-gray-900"
+                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                } rounded-md px-4 py-2 text-base block font-medium`}
+              >
+                My Orders
+              </Link>
+            )}
+            {status === "authenticated" && user?.role === "admin" && (
+              <Link
+                href="/dashboard"
+                className={`${
+                  isActive === "/dashboard"
+                    ? "bg-gray-900"
+                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                } rounded-md px-4 py-2 text-base block font-medium`}
+              >
+                Home
+              </Link>
+            )}
+            {status === "authenticated" &&
+              (user?.role === "admin" || user?.role === "manager") && (
+                <>
+                  <Link
+                    href="/allorders"
+                    className={`${
+                      isActive === "/allorders"
+                        ? "bg-gray-900"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    } rounded-md px-4 py-2  text-base block font-medium`}
+                  >
+                    All Orders
+                  </Link>
+                  <Link
+                    href="/customers"
+                    className={`${
+                      isActive === "/customers"
+                        ? "bg-gray-900"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    } rounded-md px-4 py-2  text-base block font-medium`}
+                  >
+                    Customers
+                  </Link>
+                  <Link
+                    href="/productlist"
+                    className={`${
+                      isActive === "/productlist"
+                        ? "bg-gray-900"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    } rounded-md px-4 py-2  text-base block font-medium`}
+                  >
+                    Product List
+                  </Link>
+                </>
+              )}
           </div>
         </div>
       )}
