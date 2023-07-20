@@ -1,5 +1,5 @@
 
-The demo is deployed on Vercel, but if you want to run the development server:
+The [Demo](https://e-commerce-frontend-lime.vercel.app/) is deployed on Vercel, but if you want to run the development server locally:
 
 #### npm run dev
 
